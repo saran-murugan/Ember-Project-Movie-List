@@ -1,0 +1,174 @@
+<div class="container" {{on-key "Escape" this.routeChange}}>
+    <h1>Movie List</h1>
+    <hr>
+
+    <div class="bulk-delete">
+        <button id="bulk-delete-btn" type="button"{{on-key "Delete" this.bulkDeleteTask.perform}} {{on "click" this.bulkDeleteTask.perform}} {{on-click-outside this.messageHidden}}>Delete Selected</button>
+        {{#if this.isMessage}}
+        <span id="select-msg">(Double click the movie list to select the movie)</span>
+        {{/if}}
+    </div>
+
+    {{#each this.flashMessages.queue as |flash|}}
+    <FlashMessage @flash={{flash}} class="flash-message"/>
+    {{/each}}
+
+    {{#if (or (eq this.currentRoute "movies") (eq this.currentRoute "movies.index"))}}
+    <button class="add-page-btn" type="button" {{on-key "Ctrl+c" this.openCreatePage}}>
+        <LinkTo class="add-page"  @route="movies.create">
+          Create Movie    
+        </LinkTo>
+    </button>
+    {{/if}}
+
+    <input type="text" id="search-movie" {{on "input" this.updateSearchMovie }} placeholder="search movie here">
+
+    <div class="controls" {{on-click-outside this.genreReset}}>
+        <label for="genre-filter">Filter by Genre:</label>
+        <PowerSelect class="genre" @options={{this.genres}} @selected={{this.selectedGenre}} @onChange={{this.updateGenreFilter}} @placeholder="Select Genre" as |genre|>
+        {{genre}}
+        </PowerSelect>
+    </div>
+
+    <LinkTo class="demo-page" @route="movies.demo-page">
+        <button class="demo-btn" type="button" {{on-key "Ctrl+d" this.openDemoPage}}>Demo page</button>
+    </LinkTo>
+
+    <button id="info-btn"{{on-key "Ctrl+i" this.infoMessageShow}} {{on "click" this.infoMessageShow}} {{on-click-outside this.hideInfo}}>Shortcuts Info</button>
+
+    {{#liquid-if predicate=this.isInfo class="key-info"}}
+    <div class="keyboard-info">
+        <ul>
+            <li>Add movie - <span>Enter</span></li>
+            <li>Save edit - <span>Enter</span></li>
+            <li>Cancel edit - <span>Escape</span></li>
+            <li>Goback - <span>Escape</span></li>
+            <li>Info Button - <span>Ctrl + i</span></li>
+            <li>Delete option - <span>Delete</span></li>
+            <li>Open Movielist - <span>Ctrl + o</span></li>
+            <li>Open create - <span>Ctrl + c</span></li>
+            <li>Open Demopage - <span>Ctrl + d</span></li>
+        </ul>
+    </div>
+    {{/liquid-if}}
+
+    <div class="movie-list-container">
+        <div class="scrollable-head">
+        <table class="movie-table">
+            <thead>
+                <tr>
+                    {{#if this.isNameCol}} 
+                    <th>Name<button {{on "click" this.showNameCol}} class="col-hide-btn">&harr;</button></th>
+                    {{else}}
+                    <th class="hide-col"><button {{on "click" this.showNameCol}} class="col-show-btn">&harr;</button></th>
+                     {{/if}}
+
+                    {{#if this.isYearCol}} 
+                    <th>Year<button {{on "click" this.showYearCol}} class="col-hide-btn">&harr;</button></th>
+                    {{else}}
+                    <th class="hide-col"><button {{on "click" this.showYearCol}} class="col-show-btn">&harr;</button></th>
+                     {{/if}}
+
+                    {{#if this.isGenreCol}} 
+                    <th>Genre<button {{on "click" this.showGenreCol}} class="col-hide-btn">&harr;</button></th>
+                    {{else}}
+                    <th class="hide-col"><button {{on "click" this.showGenreCol}} class="col-show-btn">&harr;</button></th>
+                     {{/if}}
+
+                    {{#if this.isFormatCol}} 
+                    <th>
+                        Format
+                        <button {{on "click" this.showFormatCol}} class="col-hide-btn">&harr;</button>
+                    </th>
+                    {{else}}
+                    <th class="hide-col">
+                        <button {{on "click" this.showFormatCol}} class="col-show-btn">&harr;</button>
+                    </th>
+                     {{/if}}
+
+                    {{#if this.isLanguageCol}} 
+                    <th>
+                        Languages
+                        <button {{on "click" this.showLanguageCol}} class="col-hide-btn">&harr;</button>
+                    </th>
+                    {{else}}
+                    <th class="hide-col">
+                        <button {{on "click" this.showLanguageCol}} class="col-show-btn">&harr;</button>
+                    </th>
+                     {{/if}}
+
+                    {{#if this.isOptionsCol}} 
+                    <th>
+                        Options
+                        <button {{on "click" this.showOptionsCol}} class="col-hide-btn">&harr;</button>
+                    </th>
+                    {{else}}
+                    <th class="hide-col">
+                        <button {{on "click" this.showOptionsCol}} class="col-show-btn">&harr;</button>
+                    </th>
+                     {{/if}}
+                </tr> 
+            </thead>
+        </table>
+        </div>
+        <div class="scrollable-body"  id="movie-list">
+            <table class="movie-table">
+                {{#if (is-empty this.filteredMovieList)}}
+                <td id="fall-p" colspan="6">No Movies Found,try different filter or search query</td>
+                {{else}}
+                {{log this.filteredMovieList}}
+                <VerticalCollection
+                @items={{this.filteredMovieList}}
+                @bufferSize={{5}}
+                @estimateHeight={{50}}
+                @key="id"
+                @containerSelector="#movie-list"
+                as |movie| >
+                    <tr class={{if movie.isSelected "selected"}} {{on "dblclick" (fn this.selectMovie movie)}}>
+                        {{#if this.isNameCol}}
+                        <td>{{movie.name}}</td>
+                        {{else}}
+                        <td class="hide-col"></td>
+                        {{/if}}
+
+                        {{#if this.isYearCol}}
+                        <td>{{movie.year}}</td>
+                        {{else}}
+                        <td class="hide-col"></td>
+                        {{/if}}
+
+                       {{#if this.isGenreCol}}
+                        <td>{{movie.genre}}</td>
+                        {{else}}
+                        <td class="hide-col"></td>
+                        {{/if}}
+
+                        {{#if this.isFormatCol}}
+                        <td>{{movie.format}}</td>
+                        {{else}}
+                        <td class="hide-col"></td>
+                        {{/if}}
+
+                        {{#if this.isLanguageCol}}
+                        <td>{{join ", " movie.languages}}</td>
+                        {{else}}
+                        <td class="hide-col"></td>
+                        {{/if}}
+
+                        {{#if this.isOptionsCol}}
+                        <td>
+                            <LinkTo @route="movies.edit" @model={{movie.id}}>
+								<button class="edit-btn" type="button">Edit</button>
+                            </LinkTo>
+                            <button class="delete-btn" type="button" {{on "click" (fn this.deleteMovieTask.perform movie)}}>Delete</button>
+                        </td>
+                        {{else}}
+                        <td class="hide-col"></td>
+                        {{/if}}
+                    </tr>
+                </VerticalCollection>
+                {{/if}}
+            </table>
+        </div>
+    </div>
+</div>

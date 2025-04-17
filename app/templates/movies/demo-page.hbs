@@ -1,0 +1,52 @@
+<div class="demo-container">
+    <h2>Demo Movie List</h2>
+    <hr>
+    <LinkTo @route="movies.index" {{on-key "Escape" this.goBack}}>
+        <button type="button" id="back-to-movies">Back to movies list</button>
+    </LinkTo>
+
+	<div class="movie-list-container">
+        <div class="scrollable-head">
+            <table class="movie-table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Year</th>
+                        <th>Genre</th>
+                        <th>Format</th> 
+                        <th>Languages</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+        <div class="scrollable-body"  id="movie-list">
+            <table class="movie-table">
+
+               {{!-- {{log @model.moviesList}}
+                {{log this.model.moviesList}}  both are same --}}
+
+                {{#if (is-empty @model.moviesList)}}
+                <td id="fall-p" colspan="6">No Movies Found</td>
+                {{else}}
+                < VerticalCollection 
+                @items = {{this.moviesToDisplay}}
+                @estimateHeight = {{50}}
+				@firstReached = {{this.scrollingAbove}}
+				@lastReached = {{this.scrollingBelow}}
+                @key = "id"
+                @containerSelector = "#movie-list"
+                as |movie| 
+                >
+				<tr>
+					<td>{{movie.name}}</td>
+                    <td>{{movie.year}}</td>
+                    <td>{{movie.genre}}</td>
+                    <td>{{movie.format}}</td>
+                    <td>{{join ", " movie.languages}}</td>
+                </tr>
+                </VerticalCollection>
+                {{/if}}
+            </table>
+        </div>
+    </div>
+</div>

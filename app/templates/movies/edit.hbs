@@ -1,0 +1,32 @@
+<div class="container-edit" {{on-click-outside this.routeChange}}>
+
+    <h2>Edit Movie</h2>
+    <label>Movie Name:</label>
+    <input type="text" value={{@model.movie.name}} {{on "input" (fn this.updateField "name")}}>
+    <br>
+    <label>Release Year:</label>
+    <input type="text" value={{@model.movie.year}} {{on "input" (fn this.updateField "year")}}>
+    <br>
+    <label>Genre:</label>
+    <input type="text" value={{@model.movie.genre}} {{on "input" (fn this.updateField "genre")}}>
+    <br>
+    <label>Format:</label>
+    <label><input type="radio" checked={{this.isFormatInclude "2D"}} name="format" value="2D" {{on "change" (fn this.updateField "format")}}>2D</label>
+    <label><input type="radio" checked={{this.isFormatInclude "3D"}} name="format" value="3D" {{on "change" (fn this.updateField "format")}}>3D</label>
+    <label><input type="radio" checked={{this.isFormatInclude "IMAX"}} name="format" value="IMAX" {{on "change" (fn this.updateField "format")}}>IMAX</label>    
+    <br>
+    <br>
+    <label>Languages:</label>
+    <label><input type="checkbox" checked={{this.isLanguageInclude "Tamil"}} value="Tamil" {{on "change" (fn this.updateLang )}}> Tamil</label>
+    <label><input type="checkbox" checked={{this.isLanguageInclude "English"}} value="English" {{on "change" (fn this.updateLang )}}> English</label>
+    <label><input type="checkbox" checked={{this.isLanguageInclude "Malayalam"}} value="Malayalam" {{on "change" (fn this.updateLang )}}> Malayalam</label>
+    <label><input type="checkbox" checked={{this.isLanguageInclude "Hindi"}} value="Hindi" {{on "change" (fn this.updateLang )}}> Hindi</label>
+    <br>
+    <button class="save-btn" type="button" {{on-key "Enter" this.saveEdit.perform }} {{on "click" this.saveEdit.perform }}>Save</button>
+    <button class="cancel-btn" type="button" {{on-key "Escape" this.cancelEdit.perform}} {{on "click" this.cancelEdit.perform}}>Cancel</button>
+
+    {{#each this.flashMessages.queue as |flash|}}
+    <FlashMessage @flash={{flash}} class="flash-message"/>
+    {{/each}}
+    
+</div>

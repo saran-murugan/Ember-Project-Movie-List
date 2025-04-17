@@ -1,0 +1,24 @@
+<form class="create-form"  {{on-click-outside this.routeChange}}>
+<h2>Create Movie</h2>
+<label>Movie Name:</label>
+<input type="text" value={{this.movieName}} class={{if (and this.formTried (not this.movieName)) "error-field"}} {{on "input" this.updateMovieName}} placeholder="Movie Name">
+<label>Release Year:</label>
+<input type="text" value={{this.movieYear}} class={{if (and this.formTried (not this.movieYear)) "error-field"}} {{on "input" this.updateMovieYear}} placeholder="Release Year">
+<label>Genre:</label>
+<input type="text" value={{this.movieGenre}} class={{if (and this.formTried (not this.movieGenre)) "error-field"}} {{on "input" this.updateMovieGenre}} placeholder="Genre">
+<br>
+<label>Format:</label>
+<label><input type="radio" name="format" value="2D" {{on "change" (fn this.updateFormat "2D")}}> 2D</label>
+<label><input type="radio" name="format" value="3D" {{on "change" (fn this.updateFormat "3D")}}> 3D</label>
+<label><input type="radio" name="format" value="IMAX" {{on "change" (fn this.updateFormat "IMAX")}}> IMAX</label>
+
+<br>
+<label>Languages:</label>
+<label><input type="checkbox" value="English" {{on "change" (fn this.toggleLanguage "English")}}> English</label>
+<label><input type="checkbox" value="Hindi" {{on "change" (fn this.toggleLanguage "Hindi")}}> Hindi</label>
+<label><input type="checkbox" value="Tamil" {{on "change" (fn this.toggleLanguage "Tamil")}}> Tamil</label>
+<label><input type="checkbox" value="Malayalam" {{on "change" (fn this.toggleLanguage "Malayalam")}}> Malayalam</label>
+<br>
+<button class="save-btn" type="button" {{on "click" this.createMovie}} {{on-key "Enter" this.createMovie}}>Create</button>
+<button class = "cancel-btn" type="submit" {{on "click" this.goBack}} {{on-key "Escape" this.goBack}}>Back</button>
+</form>

@@ -1,0 +1,10 @@
+
+{{#if (eq this.currentRoute "index")}}
+<button type="button" class="home-page-btn" {{on-key "Ctrl+o" this.goToMovies}}><LinkTo class="home-btn" @route="movies">Show the List</LinkTo></button>
+{{/if}}
+
+{{liquid-outlet}}
+
+<BasicDropdownWormhole />
+
+

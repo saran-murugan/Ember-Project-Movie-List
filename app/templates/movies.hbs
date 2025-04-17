@@ -1,0 +1,8 @@
+{{#if (eq this.currentRoute "movies.index")}}
+<MovieList @movies={{@model}} @router={{this.router}}/>
+{{/if}}
+
+{{liquid-outlet}}
+
+
+
