@@ -30,6 +30,14 @@ export default class MovieListComponent extends Component {
     { name: 'options', labelName: 'options', visible: true },
   ];
 
+  @tracked specificSearch = {
+    name:"", year:"", genre:"", format:"", languages:"",
+  }
+
+  @action updateSpecificSearch(column,event){
+    this.specificSearch = {...this.specificSearch,[column]:event.target.value.toLowerCase()};
+  }
+
   @action toggleDropdown() {
     this.isShowDropDown = !this.isShowDropDown;
   }
@@ -78,7 +86,7 @@ export default class MovieListComponent extends Component {
 
   getUniqueGenres() {
     let allGenres = this.moviesList.flatMap((movie) => movie.genre.split(','));
-    return [...new Set(allGenres), 'none'];
+    return [...new Set(allGenres)];
   }
 
   @action updateGenreFilter(selectedGenre) {
@@ -90,24 +98,28 @@ export default class MovieListComponent extends Component {
   }
 
   @action updateSearchMovie(event) {
-    this.searchMovie = event.target.value;
+    this.searchMovie = event.target.value.toLowerCase();
   }
 
-  get filteredMovieList() {
+  get filteredMovieList() {   
     if (this.searchMovie) {
       return this.moviesList.filter((movie) =>
         movie.name.toLowerCase().includes(this.searchMovie.toLowerCase()),
       );
     }
     if (this.selectedGenre) {
-      if (this.selectedGenre.includes('none')) {
-        return this.moviesList;
-      } else {
         return this.moviesList.filter((movie) =>
           movie.genre.toLowerCase().includes(this.selectedGenre.toLowerCase()),
         );
       }
-    }
+    if (this.specificSearch){
+      return this.moviesList.filter((movie)=>{
+        return Object.entries(this.specificSearch).every(([key,value]) =>{
+          if (!value) return true;
+          return String(movie[key]).toLowerCase().includes(value); 
+          })
+        })
+      }
     return this.moviesList;
   }
 

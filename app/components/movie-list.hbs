@@ -76,6 +76,14 @@
                     {{#if this.isVisible.languages}}<th>Languages</th>{{/if}}
                     {{#if this.isVisible.options}}<th>Options</th>{{/if}}
                 </tr>
+                <tr class="specific-search-tr">
+                    {{#if this.isVisible.name}}<th><input type="text" value={{this.specificSearch.name}} {{on "input" (fn this.updateSpecificSearch "name")}} placeholder="search by name" /></th>{{/if}}
+                    {{#if this.isVisible.year}}<th><input type="text" value={{this.specificSearch.year}} {{on "input"  (fn this.updateSpecificSearch "year")}} placeholder="search by year" /></th>{{/if}}
+                    {{#if this.isVisible.genre}}<th><input type="text" value={{this.specificSearch.genre}} {{on "input"  (fn this.updateSpecificSearch "genre")}} placeholder="search by genre" /></th>{{/if}}
+                    {{#if this.isVisible.format}}<th><input type="text" value={{this.specificSearch.format}} {{on "input"  (fn this.updateSpecificSearch "format")}} placeholder="search by format" /></th>{{/if}}
+                    {{#if this.isVisible.languages}}<th><input type="text" value={{this.specificSearch.languages}} {{on "input"  (fn this.updateSpecificSearch "languages")}} placeholder="search by languages" /></th>{{/if}}
+                    {{#if this.isVisible.options}}<th></th>{{/if}}
+                </tr>
             </thead>
         </table>
         </div>
@@ -84,7 +92,7 @@
                 {{#if (is-empty this.filteredMovieList)}}
                 <td id="fall-p" colspan="6">No Movies Found,try different filter or search query</td>
                 {{else}}
-               {{!--  {{log this.filteredMovieList}} --}}
+                {{log this.filteredMovieList}}
                 <VerticalCollection
                 @items={{this.filteredMovieList}}
                 @bufferSize={{5}}
@@ -92,7 +100,6 @@
                 @key="id"
                 @containerSelector="#movie-list"
                 as |movie| >
-                {{log this.colVisibilty}}
                     <tr class={{if movie.isSelected "selected"}} {{on "dblclick" (fn this.selectMovie movie)}}>
                         {{#if this.isVisible.name}}<td>{{movie.name}}</td>{{/if}}
                         {{#if this.isVisible.year}}<td>{{movie.year}}</td>{{/if}}
