@@ -13,7 +13,7 @@ export default class MoviesRoute extends Route {
       controller.set('currentRoute', this.router.currentRouteName);
     });
   }
-  
+
   model() {
     return this.movies;
   }

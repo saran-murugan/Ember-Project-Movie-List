@@ -4,8 +4,12 @@ import { action } from '@ember/object';
 import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
 
-
 export default class MovieListComponent extends Component {
+  constructor() {
+    super(...arguments);
+    this.genres = this.getUniqueGenres();
+  }
+
   @service router;
   @service flashMessages;
 
@@ -15,43 +19,42 @@ export default class MovieListComponent extends Component {
   @tracked genres = [];
   @tracked isInfo = false;
 
-  @tracked isNameCol = true;
-  @tracked isYearCol = true; 
-  @tracked isGenreCol =true;
-  @tracked isFormatCol = true;
-  @tracked isLanguageCol = true;
-  @tracked isOptionsCol = true;
-  
-  constructor() {
-    super(...arguments);
-    this.genres = this.getUniqueGenres();
+  @tracked isShowDropDown = false;
+
+  @tracked columnsOptions = [
+    { name: 'name', labelName: 'Name', visible: true },
+    { name: 'year', labelName: 'Year', visible: true },
+    { name: 'genre', labelName: 'Genre', visible: true },
+    { name: 'format', labelName: 'Format', visible: true },
+    { name: 'languages', labelName: 'Languages', visible: true },
+    { name: 'options', labelName: 'options', visible: true },
+  ];
+
+  @action toggleDropdown() {
+    this.isShowDropDown = !this.isShowDropDown;
   }
 
-  @action showNameCol(){
-    this.isNameCol = !this.isNameCol;
-  }
-  @action showYearCol(){
-    this.isYearCol = !this.isYearCol;
-  }
-  @action showGenreCol(){
-    this.isGenreCol = !this.isGenreCol;
-  }
-  @action showFormatCol(){
-    this.isFormatCol = !this.isFormatCol;
-  }
-  @action showLanguageCol(){
-    this.isLanguageCol = !this.isLanguageCol;
-  }
-  @action showOptionsCol(){
-    this.isOptionsCol = !this.isOptionsCol;
+  @action toggleColumn(colName) {
+    let column = this.columnsOptions.find((column) => column.name === colName);
+    column.visible = !column.visible;
+    this.columnsOptions = [...this.columnsOptions];
   }
 
-
-
-  @action infoMessageShow(){
-   this.isInfo = !this.isInfo;
+  get isVisible() {
+    return this.columnsOptions.reduce((accumulator, column) => {
+      accumulator[column.name] = column.visible;
+      return accumulator;
+    }, {});
   }
-  @action hideInfo(){
+
+  @action hideDropDown() {
+    this.isShowDropDown = false;
+  }
+
+  @action infoMessageShow() {
+    this.isInfo = !this.isInfo;
+  }
+  @action hideInfo() {
     this.isInfo = false;
   }
 
@@ -67,9 +70,9 @@ export default class MovieListComponent extends Component {
     return this.args.movies.moviesList;
   }
 
-  @action routeChange(){
-    if (this.currentRoute == "movies.index"){
-      this.router.transitionTo("index");
+  @action routeChange() {
+    if (this.currentRoute == 'movies.index') {
+      this.router.transitionTo('index');
     }
   }
 
@@ -82,7 +85,7 @@ export default class MovieListComponent extends Component {
     this.selectedGenre = selectedGenre;
   }
 
-  @action genreReset(){
+  @action genreReset() {
     this.selectedGenre = null;
   }
 
@@ -92,14 +95,16 @@ export default class MovieListComponent extends Component {
 
   get filteredMovieList() {
     if (this.searchMovie) {
-      return this.moviesList.filter((movie) => movie.name.toLowerCase().includes(this.searchMovie.toLowerCase()),
+      return this.moviesList.filter((movie) =>
+        movie.name.toLowerCase().includes(this.searchMovie.toLowerCase()),
       );
     }
     if (this.selectedGenre) {
       if (this.selectedGenre.includes('none')) {
         return this.moviesList;
       } else {
-        return this.moviesList.filter((movie) => movie.genre.toLowerCase().includes(this.selectedGenre.toLowerCase()),
+        return this.moviesList.filter((movie) =>
+          movie.genre.toLowerCase().includes(this.selectedGenre.toLowerCase()),
         );
       }
     }
@@ -109,7 +114,9 @@ export default class MovieListComponent extends Component {
   @task *deleteMovieTask(movie) {
     try {
       yield new Promise((resolve) => setTimeout(resolve, 500));
-      this.args.movies.moviesList = this.args.movies.moviesList.filter((m) => m !== movie,);
+      this.args.movies.moviesList = this.args.movies.moviesList.filter(
+        (m) => m !== movie,
+      );
       this.flashMessages.success('Movie deleted successfully');
     } catch (error) {
       console.error('Error deleting movie:', error);
@@ -118,38 +125,41 @@ export default class MovieListComponent extends Component {
   }
 
   @action selectMovie(movie) {
-    this.args.movies.moviesList = this.args.movies.moviesList.map((m) => m.id === movie.id ? { ...m, isSelected: !m.isSelected } : m,);
+    this.args.movies.moviesList = this.args.movies.moviesList.map((m) =>
+      m.id === movie.id ? { ...m, isSelected: !m.isSelected } : m,
+    );
   }
 
   @task *bulkDeleteTask() {
-    try{
-      let selectedMovies = this.args.movies.moviesList.filter((movie) => movie.isSelected);
+    try {
+      let selectedMovies = this.args.movies.moviesList.filter(
+        (movie) => movie.isSelected,
+      );
 
       yield new Promise((resolve) => setTimeout(resolve, 500));
-      this.args.movies.moviesList = this.args.movies.moviesList.filter((movie) => !movie.isSelected,);
+      this.args.movies.moviesList = this.args.movies.moviesList.filter(
+        (movie) => !movie.isSelected,
+      );
       this.isMessage = true;
 
-      if(selectedMovies.length == 0){
-        this.flashMessages.warning("Select atleast one movie");
+      if (selectedMovies.length == 0) {
+        this.flashMessages.warning('Select atleast one movie');
+      } else if (selectedMovies.length > 0) {
+        this.flashMessages.success('Bulk deletion completed');
       }
-      else if(selectedMovies.length > 0){
-      this.flashMessages.success('Bulk deletion completed');
-      }
-
     } catch (error) {
       console.error('Error during bulk delete:', error);
       this.flashMessages.danger('Bulk Deletion Incomplete');
     }
   }
 
-  @action openDemoPage(event){
+  @action openDemoPage(event) {
     event.preventDefault();
-    this.router.transitionTo("movies.demo-page");
+    this.router.transitionTo('movies.demo-page');
   }
 
-  @action openCreatePage(event){
+  @action openCreatePage(event) {
     event.preventDefault();
-    this.router.transitionTo("movies.create");
+    this.router.transitionTo('movies.create');
   }
-} 
-  
+}

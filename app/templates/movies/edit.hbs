@@ -17,10 +17,10 @@
     <br>
     <br>
     <label>Languages:</label>
-    <label><input type="checkbox" checked={{this.isLanguageInclude "Tamil"}} value="Tamil" {{on "change" (fn this.updateLang )}}> Tamil</label>
-    <label><input type="checkbox" checked={{this.isLanguageInclude "English"}} value="English" {{on "change" (fn this.updateLang )}}> English</label>
-    <label><input type="checkbox" checked={{this.isLanguageInclude "Malayalam"}} value="Malayalam" {{on "change" (fn this.updateLang )}}> Malayalam</label>
-    <label><input type="checkbox" checked={{this.isLanguageInclude "Hindi"}} value="Hindi" {{on "change" (fn this.updateLang )}}> Hindi</label>
+    <label><input type="checkbox" checked={{this.isLanguageInclude "Tamil"}} value="Tamil" {{on "change" this.updateLang}}> Tamil</label>
+    <label><input type="checkbox" checked={{this.isLanguageInclude "English"}} value="English" {{on "change" this.updateLang}}> English</label>
+    <label><input type="checkbox" checked={{this.isLanguageInclude "Malayalam"}} value="Malayalam" {{on "change" this.updateLang}}> Malayalam</label>
+    <label><input type="checkbox" checked={{this.isLanguageInclude "Hindi"}} value="Hindi" {{on "change" this.updateLang}}> Hindi</label>
     <br>
     <button class="save-btn" type="button" {{on-key "Enter" this.saveEdit.perform }} {{on "click" this.saveEdit.perform }}>Save</button>
     <button class="cancel-btn" type="button" {{on-key "Escape" this.cancelEdit.perform}} {{on "click" this.cancelEdit.perform}}>Cancel</button>

@@ -16,22 +16,23 @@ export default class MoviesEditController extends Controller {
     this.model.movie[field] = event.target.value;
   }
 
-  @action updateLang(event){
-    if(this.languages.includes(event.target.value)){
-      this.languages = this.languages.filter((lang)=> lang !== event.target.value)
+  @action updateLang(event) {
+    if (this.languages.includes(event.target.value)) {
+      this.languages = this.languages.filter(
+        (lang) => lang !== event.target.value,
+      );
       console.log(this.languages);
-    }
-    else{
-      this.languages = [...this.languages,event.target.value];
+    } else {
+      this.languages = [...this.languages, event.target.value];
       console.log(this.languages);
     }
   }
 
-  @action isLanguageInclude(lang){
+  @action isLanguageInclude(lang) {
     return this.languages.includes(lang);
   }
 
-  @action isFormatInclude(format){
+  @action isFormatInclude(format) {
     return this.format.includes(format);
   }
 
@@ -39,21 +40,23 @@ export default class MoviesEditController extends Controller {
     let { movie, movieIndex } = this.model;
     movie.languages = this.languages;
     if (movieIndex !== -1) {
-      this.movies.moviesList = this.movies.moviesList.map((m, index) => index === movieIndex ? { ...movie } : m);
+      this.movies.moviesList = this.movies.moviesList.map((m, index) =>
+        index === movieIndex ? { ...movie } : m,
+      );
     }
     console.log(this.movies.moviesList);
     this.flashMessages.success('Edit Saved');
-    yield new Promise((resolve) =>setTimeout(resolve,1000));
+    yield new Promise((resolve) => setTimeout(resolve, 1000));
     this.router.transitionTo('movies.index');
   }
 
-  @action routeChange(){
+  @action routeChange() {
     this.router.transitionTo('movies.index');
   }
-  
+
   @task *cancelEdit() {
-    this.flashMessages.info("Edit cancelled");
-    yield new Promise((resolve) => setTimeout(resolve,1000));
+    this.flashMessages.info('Edit cancelled');
+    yield new Promise((resolve) => setTimeout(resolve, 1000));
     this.router.transitionTo('movies');
   }
 }

@@ -6,21 +6,21 @@ import { action } from '@ember/object';
 export default class MoviesDemoPageController extends Controller {
   @service movies;
   @service router;
-  
+
   @tracked moviesToDisplay = [];
   @tracked startIndex = 0;
   @tracked firstMovieSet = 10;
 
-  constructor(){
+  constructor() {
     super(...arguments);
     this.moviesToDisplay = this.loadInitialMovies();
   }
 
-  loadInitialMovies(){
-    return this.movies.moviesList.slice(this.startIndex,this.firstMovieSet);
+  loadInitialMovies() {
+    return this.movies.moviesList.slice(this.startIndex, this.firstMovieSet);
   }
 
-/* //  For infinite scrolling and bidirectional scrolling functionality
+  /* //  For infinite scrolling and bidirectional scrolling functionality
   @action scrollingAbove(){
     console.log("before:",this.startIndex);
 
@@ -46,19 +46,21 @@ export default class MoviesDemoPageController extends Controller {
     return movie.id;
   */
 
-  @action scrollingBelow(){
-
-   /*  console.log("scrolling down");
+  @action scrollingBelow() {
+    /*  console.log("scrolling down");
     console.log("startIndex",this.startIndex,"displaylength:",this.moviesToDisplay.length); */
     let nextIndex = this.startIndex + this.moviesToDisplay.length;
-    let nextMovieSet = this.movies.moviesList.slice(nextIndex,this.moviesToDisplay.length+nextIndex);
-    console.log(nextIndex,nextMovieSet);
-    if(nextMovieSet.length > 0){
-      this.moviesToDisplay = [...this.moviesToDisplay,...nextMovieSet];
+    let nextMovieSet = this.movies.moviesList.slice(
+      nextIndex,
+      this.moviesToDisplay.length + nextIndex,
+    );
+    console.log(nextIndex, nextMovieSet);
+    if (nextMovieSet.length > 0) {
+      this.moviesToDisplay = [...this.moviesToDisplay, ...nextMovieSet];
     }
   }
 
-  @action goBack(){
-      this.router.transitionTo("movies.index");
-    }
+  @action goBack() {
+    this.router.transitionTo('movies.index');
+  }
 }

@@ -9,7 +9,7 @@ export default class MoviesService extends Service {
       year: 2006,
       genre: 'Biography, Drama',
       format: '2D',
-      languages: ['English','Tamil'],
+      languages: ['English', 'Tamil'],
       isSelected: false,
     },
     {
@@ -144,7 +144,7 @@ export default class MoviesService extends Service {
       year: 2019,
       genre: ' Superheroes, Action, Thriller',
       format: 'IMAX',
-      languages: ['English', 'Tamil','Malayalam'],
+      languages: ['English', 'Tamil', 'Malayalam'],
       isSelected: false,
     },
     {
@@ -153,7 +153,7 @@ export default class MoviesService extends Service {
       year: 1998,
       genre: ' Fantasy, Mystery, Thriller',
       format: '3D',
-      languages: ['English', 'Tamil','Malayalam'],
+      languages: ['English', 'Tamil', 'Malayalam'],
       isSelected: false,
     },
     {
@@ -188,5 +188,4 @@ export default class MoviesService extends Service {
   addMovie(movie) {
     this.moviesList = [...this.moviesList, movie];
   }
-  
 }

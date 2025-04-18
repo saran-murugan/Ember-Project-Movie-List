@@ -7,5 +7,4 @@ export default class MoviesDemoPageRoute extends Route {
   model() {
     return this.movies;
   }
-  
 }

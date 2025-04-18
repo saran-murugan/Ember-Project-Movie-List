@@ -34,9 +34,9 @@
         <button class="demo-btn" type="button" {{on-key "Ctrl+d" this.openDemoPage}}>Demo page</button>
     </LinkTo>
 
-    <button id="info-btn"{{on-key "Ctrl+i" this.infoMessageShow}} {{on "click" this.infoMessageShow}} {{on-click-outside this.hideInfo}}>Shortcuts Info</button>
+    <button id="info-btn" type="button" {{on-key "Ctrl+i" this.infoMessageShow}} {{on "click" this.infoMessageShow}} {{on-click-outside this.hideInfo}}>Shortcuts Info</button>
 
-    {{#liquid-if predicate=this.isInfo class="key-info"}}
+    <LiquidIf @predicate={{this.isInfo}} @class="key-info">
     <div class="keyboard-info">
         <ul>
             <li>Add movie - <span>Enter</span></li>
@@ -50,64 +50,32 @@
             <li>Open Demopage - <span>Ctrl + d</span></li>
         </ul>
     </div>
-    {{/liquid-if}}
+    </LiquidIf>
+
+    <button class="col-dropdown-btn" type="button" {{on "click" this.toggleDropdown}} >Columns show/hide</button>
+    {{#if this.isShowDropDown}}
+    <div class="col-dropdown" {{on-click-outside this.hideDropDown}}>
+        {{#each this.columnsOptions as |column|}}
+        <div> 
+            <label><input type="checkbox" checked={{column.visible}} {{on "change" (fn this.toggleColumn column.name)}}>{{column.labelName}}</label>
+        </div>
+        {{/each}}
+    </div>
+    {{/if}}
 
     <div class="movie-list-container">
+        {{#if (atleast-one-column-present this.isVisible)}}
         <div class="scrollable-head">
         <table class="movie-table">
             <thead>
                 <tr>
-                    {{#if this.isNameCol}} 
-                    <th>Name<button {{on "click" this.showNameCol}} class="col-hide-btn">&harr;</button></th>
-                    {{else}}
-                    <th class="hide-col"><button {{on "click" this.showNameCol}} class="col-show-btn">&harr;</button></th>
-                     {{/if}}
-
-                    {{#if this.isYearCol}} 
-                    <th>Year<button {{on "click" this.showYearCol}} class="col-hide-btn">&harr;</button></th>
-                    {{else}}
-                    <th class="hide-col"><button {{on "click" this.showYearCol}} class="col-show-btn">&harr;</button></th>
-                     {{/if}}
-
-                    {{#if this.isGenreCol}} 
-                    <th>Genre<button {{on "click" this.showGenreCol}} class="col-hide-btn">&harr;</button></th>
-                    {{else}}
-                    <th class="hide-col"><button {{on "click" this.showGenreCol}} class="col-show-btn">&harr;</button></th>
-                     {{/if}}
-
-                    {{#if this.isFormatCol}} 
-                    <th>
-                        Format
-                        <button {{on "click" this.showFormatCol}} class="col-hide-btn">&harr;</button>
-                    </th>
-                    {{else}}
-                    <th class="hide-col">
-                        <button {{on "click" this.showFormatCol}} class="col-show-btn">&harr;</button>
-                    </th>
-                     {{/if}}
-
-                    {{#if this.isLanguageCol}} 
-                    <th>
-                        Languages
-                        <button {{on "click" this.showLanguageCol}} class="col-hide-btn">&harr;</button>
-                    </th>
-                    {{else}}
-                    <th class="hide-col">
-                        <button {{on "click" this.showLanguageCol}} class="col-show-btn">&harr;</button>
-                    </th>
-                     {{/if}}
-
-                    {{#if this.isOptionsCol}} 
-                    <th>
-                        Options
-                        <button {{on "click" this.showOptionsCol}} class="col-hide-btn">&harr;</button>
-                    </th>
-                    {{else}}
-                    <th class="hide-col">
-                        <button {{on "click" this.showOptionsCol}} class="col-show-btn">&harr;</button>
-                    </th>
-                     {{/if}}
-                </tr> 
+                    {{#if this.isVisible.name}}<th>Name</th>{{/if}}
+                    {{#if this.isVisible.year}}<th>Year</th>{{/if}}
+                    {{#if this.isVisible.genre}}<th>Genre</th>{{/if}}
+                    {{#if this.isVisible.format}}<th>Format</th>{{/if}}
+                    {{#if this.isVisible.languages}}<th>Languages</th>{{/if}}
+                    {{#if this.isVisible.options}}<th>Options</th>{{/if}}
+                </tr>
             </thead>
         </table>
         </div>
@@ -116,7 +84,7 @@
                 {{#if (is-empty this.filteredMovieList)}}
                 <td id="fall-p" colspan="6">No Movies Found,try different filter or search query</td>
                 {{else}}
-                {{log this.filteredMovieList}}
+               {{!--  {{log this.filteredMovieList}} --}}
                 <VerticalCollection
                 @items={{this.filteredMovieList}}
                 @bufferSize={{5}}
@@ -124,51 +92,28 @@
                 @key="id"
                 @containerSelector="#movie-list"
                 as |movie| >
+                {{log this.colVisibilty}}
                     <tr class={{if movie.isSelected "selected"}} {{on "dblclick" (fn this.selectMovie movie)}}>
-                        {{#if this.isNameCol}}
-                        <td>{{movie.name}}</td>
-                        {{else}}
-                        <td class="hide-col"></td>
-                        {{/if}}
-
-                        {{#if this.isYearCol}}
-                        <td>{{movie.year}}</td>
-                        {{else}}
-                        <td class="hide-col"></td>
-                        {{/if}}
-
-                       {{#if this.isGenreCol}}
-                        <td>{{movie.genre}}</td>
-                        {{else}}
-                        <td class="hide-col"></td>
-                        {{/if}}
-
-                        {{#if this.isFormatCol}}
-                        <td>{{movie.format}}</td>
-                        {{else}}
-                        <td class="hide-col"></td>
-                        {{/if}}
-
-                        {{#if this.isLanguageCol}}
-                        <td>{{join ", " movie.languages}}</td>
-                        {{else}}
-                        <td class="hide-col"></td>
-                        {{/if}}
-
-                        {{#if this.isOptionsCol}}
+                        {{#if this.isVisible.name}}<td>{{movie.name}}</td>{{/if}}
+                        {{#if this.isVisible.year}}<td>{{movie.year}}</td>{{/if}}
+                        {{#if this.isVisible.genre}}<td>{{movie.genre}}</td>{{/if}}
+                        {{#if this.isVisible.format}}<td>{{movie.format}}</td>{{/if}}
+                        {{#if this.isVisible.languages}}<td>{{join ", " movie.languages}}</td>{{/if}}
+                        {{#if this.isVisible.options}}
                         <td>
                             <LinkTo @route="movies.edit" @model={{movie.id}}>
 								<button class="edit-btn" type="button">Edit</button>
                             </LinkTo>
                             <button class="delete-btn" type="button" {{on "click" (fn this.deleteMovieTask.perform movie)}}>Delete</button>
                         </td>
-                        {{else}}
-                        <td class="hide-col"></td>
                         {{/if}}
                     </tr>
                 </VerticalCollection>
                 {{/if}}
             </table>
         </div>
+        {{else}}
+          <p class="fall-p">Select atleast one column</p>
+        {{/if}}
     </div>
 </div>

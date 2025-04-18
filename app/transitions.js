@@ -9,12 +9,12 @@ export default function () {
   this.transition(
     this.fromRoute('movies.index'),
     this.toRoute('movies.create'),
-    this.use('toRight',{duration:500}),
+    this.use('toRight', { duration: 500 }),
   );
   this.transition(
     this.fromRoute('movies.index'),
     this.toRoute('movies.edit'),
-    this.use('toLeft',{duration:500}),
+    this.use('toLeft', { duration: 500 }),
   );
   this.transition(
     this.fromRoute('movies.index'),
@@ -22,10 +22,9 @@ export default function () {
     this.use('fade'),
   );
   this.transition(
-    this.matchSelector(".key-info"),
+    this.matchSelector('.key-info'),
     this.toValue(true),
-    this.use('toDown',{duration:600}),
-    this.reverse('toUp')
+    this.use('toDown', { duration: 600 }),
+    this.reverse('toUp'),
   );
-
 }

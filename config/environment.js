@@ -45,7 +45,7 @@ module.exports = function (environment) {
   }
 
   ENV['liquid-fire'] = {
-    enableLogging: true
+    enableLogging: true,
   };
 
   return ENV;
