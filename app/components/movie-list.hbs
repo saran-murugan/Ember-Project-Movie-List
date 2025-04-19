@@ -22,6 +22,9 @@
     {{/if}}
 
     <input type="text" id="search-movie" {{on "input" this.updateSearchMovie }} placeholder="search movie here">
+    {{#if (eq this.sortingBy "") }}
+    <p class="sort-info">(Click on the Column headers to sort the column)</p>
+    {{/if}}
 
     <div class="controls" {{on-click-outside this.genreReset}}>
         <label for="genre-filter">Filter by Genre:</label>
@@ -68,13 +71,43 @@
         <div class="scrollable-head">
         <table class="movie-table">
             <thead>
-                <tr>
-                    {{#if this.isVisible.name}}<th>Name</th>{{/if}}
-                    {{#if this.isVisible.year}}<th>Year</th>{{/if}}
-                    {{#if this.isVisible.genre}}<th>Genre</th>{{/if}}
-                    {{#if this.isVisible.format}}<th>Format</th>{{/if}}
-                    {{#if this.isVisible.languages}}<th>Languages</th>{{/if}}
-                    {{#if this.isVisible.options}}<th>Options</th>{{/if}}
+                <tr class="headers">
+                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "name")}}>
+                        Name
+                        {{#if (eq this.sortingBy "name")}}
+                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
+                        {{/if}}
+                        </th>
+                    {{/if}}
+                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "year")}}>
+                        Year
+                        {{#if (eq this.sortingBy "year")}}
+                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
+                        {{/if}}
+                        </th>
+                    {{/if}}
+                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "genre")}}>
+                        Genre
+                        {{#if (eq this.sortingBy "genre")}}
+                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
+                        {{/if}}
+                        </th>
+                    {{/if}}
+                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "format")}}>
+                        Format
+                        {{#if (eq this.sortingBy "format")}}
+                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
+                        {{/if}}
+                        </th>
+                    {{/if}}
+                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "languages")}}>
+                        Languages
+                        {{#if (eq this.sortingBy "languages")}}
+                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
+                        {{/if}}
+                        </th>
+                    {{/if}}
+                    {{#if this.isVisible.options}}<th class="no-sort">Options</th>{{/if}}
                 </tr>
                 <tr class="specific-search-tr">
                     {{#if this.isVisible.name}}<th><input type="text" value={{this.specificSearch.name}} {{on "input" (fn this.updateSpecificSearch "name")}} placeholder="search by name" /></th>{{/if}}
@@ -120,7 +153,7 @@
             </table>
         </div>
         {{else}}
-          <p class="fall-p">Select atleast one column</p>
+          <p class="fall-p">All columns are hidden. Use columns-dropdown to show some of them</p>
         {{/if}}
     </div>
 </div>

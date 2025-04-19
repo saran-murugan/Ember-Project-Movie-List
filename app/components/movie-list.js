@@ -21,6 +21,9 @@ export default class MovieListComponent extends Component {
 
   @tracked isShowDropDown = false;
 
+  @tracked sortingBy = "";
+  @tracked sortingDirection = "ascending";
+
   @tracked columnsOptions = [
     { name: 'name', labelName: 'Name', visible: true },
     { name: 'year', labelName: 'Year', visible: true },
@@ -29,6 +32,24 @@ export default class MovieListComponent extends Component {
     { name: 'languages', labelName: 'Languages', visible: true },
     { name: 'options', labelName: 'options', visible: true },
   ];
+
+  @action sortColumn(colToSort){
+    if(this.sortingBy === colToSort){
+      if(this.sortingDirection === "ascending"){
+        this.sortingDirection = "descending";
+      }
+      else if(this.sortingDirection === "descending"){
+        this.sortingBy = "";
+        this.sortingDirection = "";
+      }
+      console.log("before",this.sortingBy,this.sortingDirection);
+    }
+    else {
+      this.sortingBy = colToSort;
+      this.sortingDirection = "ascending";
+      console.log("after",this.sortingBy,this.sortingDirection);
+    }
+  }
 
   @tracked specificSearch = {
     name:"", year:"", genre:"", format:"", languages:"",
@@ -102,25 +123,49 @@ export default class MovieListComponent extends Component {
   }
 
   get filteredMovieList() {   
+
+    let filtered = this.moviesList;
+
     if (this.searchMovie) {
-      return this.moviesList.filter((movie) =>
-        movie.name.toLowerCase().includes(this.searchMovie.toLowerCase()),
+      filtered = filtered.filter((movie) =>
+        movie.name.toLowerCase().includes(this.searchMovie.toLowerCase()) ||
+        String(movie.year).includes(this.searchMovie) ||
+        movie.format.toLowerCase().includes(this.searchMovie) ||
+        movie.languages.join(", ").toLowerCase().includes(this.searchMovie.toLowerCase()) ||
+        movie.genre.toLowerCase().includes(this.searchMovie.toLowerCase())
       );
     }
     if (this.selectedGenre) {
-        return this.moviesList.filter((movie) =>
+        filtered = filtered.filter((movie) =>
           movie.genre.toLowerCase().includes(this.selectedGenre.toLowerCase()),
         );
       }
     if (this.specificSearch){
-      return this.moviesList.filter((movie)=>{
+      filtered = filtered.filter((movie)=>{
         return Object.entries(this.specificSearch).every(([key,value]) =>{
           if (!value) return true;
           return String(movie[key]).toLowerCase().includes(value); 
           })
         })
       }
-    return this.moviesList;
+    if(this.sortingBy){
+      filtered = filtered.slice().sort((a,b) => {
+        let A = a[this.sortingBy];
+        let B = b[this.sortingBy]; 
+        console.log(A,B);
+        if(typeof A === "number" && typeof B === "number"){
+          return this.sortingDirection === "ascending" ? A - B : B - A;
+        }
+
+        A = String(a[this.sortingBy]).toLowerCase();
+        B = String(b[this.sortingBy]).toLowerCase();
+        console.log(A,B);
+        if(A < B) return this.sortingDirection === "ascending"? -1 : 1
+        if(A > B) return this.sortingDirection === "ascending"? 1 : -1
+        return 0;
+      })
+    }
+    return filtered;
   }
 
   @task *deleteMovieTask(movie) {

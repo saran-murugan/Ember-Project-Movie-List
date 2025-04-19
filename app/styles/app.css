@@ -115,10 +115,17 @@ button:hover {
 
 #select-msg {
   position: absolute;
-  left: 100px;
+  left: 60px;
   top: 160px;
 }
-
+.sort-info {
+  position: absolute;
+  left:400px;
+  margin-top: 5px;
+  font-weight: 600;
+  color: #fff;
+  background-color: #333;
+}
 .demo-btn {
   position: absolute;
   right: 150px;
@@ -165,7 +172,7 @@ button:hover {
 .movie-list-container {
   box-shadow: 5px 5px 10px rgb(0, 0, 0, 0.3);
   margin-top: 30px;
-  max-height: 380px;
+  height: auto;
   width: 100%;
   overflow-x: auto;
   overflow-y: hidden;
@@ -184,12 +191,18 @@ table {
   table-layout: fixed;
   width: 100%;
 }
-.scrollable-head tr th {
+.scrollable-head .headers th:not(.no-sort){
   text-align: center;
+  cursor: pointer;
+}
+
+.scrollable-head tr th span{
+  font-size: 20px;
+  font-weight: 900;
 }
 .scrollable-head .specific-search-tr th{
   background-color: whitesmoke;
-  padding:8px 8px;
+  padding:8px 8px 0px 8px;
 }
 .scrollable-body {
   height: 300px;
