@@ -5,10 +5,17 @@ import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
 
 export default class MovieListComponent extends Component {
+    /*---------------constructor-------------------  */
   constructor() {
     super(...arguments);
     this.genres = this.getUniqueGenres();
+
+    const saveColumnWidthsFromLocalStorage = localStorage.getItem('columnWidthsSaved');
+    if(saveColumnWidthsFromLocalStorage){
+      this.columnWidths = JSON.parse(saveColumnWidthsFromLocalStorage);
+    }
   }
+   /* ---------------------------------- */
 
   @service router;
   @service flashMessages;
@@ -19,10 +26,45 @@ export default class MovieListComponent extends Component {
   @tracked genres = [];
   @tracked isInfo = false;
 
-  @tracked isShowDropDown = false;
+  
+                              /* for column resizing functionality */
+  @tracked columnWidths = {
+    name:220,
+    year:150,
+    genre:250,
+    format:150,
+    languages:250,
+ }
 
-  @tracked sortingBy = "";
-  @tracked sortingDirection = "ascending";
+ saveColumnWidths(){
+  localStorage.setItem("columnWidthsSaved",JSON.stringify(this.columnWidths));
+ }
+
+  @action resizeColumn(colName,event){
+    let startPosition = event.pageX;
+    let startingWidth = this.columnWidths[colName];
+    console.log("startX-dimension:",startPosition,"startingWidth:",startingWidth);
+
+    const mouseMove = (e)=>{
+      let newWidth = Math.max(100,startingWidth + (e.pageX - startPosition));
+      console.log("newWidth:",newWidth);
+      this.columnWidths = {...this.columnWidths,[colName]:newWidth};
+      console.log(this.columnWidths);
+    }
+    const onMouseUp = ()=>{
+        window.removeEventListener("mousemove",mouseMove);
+        window.removeEventListener("mouseup",onMouseUp)
+        this.saveColumnWidths();
+    }
+    window.addEventListener("mousemove",mouseMove)
+    window.addEventListener("mouseup",onMouseUp);
+  }
+
+                    /*-------------------------------------------*/
+
+                             /* column show/hide functionality */
+
+  @tracked isShowColumnDropdown = false;
 
   @tracked columnsOptions = [
     { name: 'name', labelName: 'Name', visible: true },
@@ -32,6 +74,30 @@ export default class MovieListComponent extends Component {
     { name: 'languages', labelName: 'Languages', visible: true },
     { name: 'options', labelName: 'options', visible: true },
   ];
+  @action toggleColumnDropdown() {
+    this.isShowColumnDropdown = !this.isShowColumnDropdown;
+  }
+  @action hideColumnDropDown() {
+    this.isShowColumnDropdown = false;
+  }
+  @action toggleColumn(colName) {
+    let column = this.columnsOptions.find((column) => column.name === colName);
+    column.visible = !column.visible;
+    this.columnsOptions = [...this.columnsOptions];
+  }
+  get isVisible() {
+    return this.columnsOptions.reduce((accumulator, column) => {
+      accumulator[column.name] = column.visible;
+      return accumulator;
+    }, {});
+  }
+
+                /*---------------------------------------------------*/
+
+                      /* Column data sorting functionality */
+
+  @tracked sortingBy = "";
+  @tracked sortingDirection = "ascending";
 
   @action sortColumn(colToSort){
     if(this.sortingBy === colToSort){
@@ -50,34 +116,18 @@ export default class MovieListComponent extends Component {
       console.log("after",this.sortingBy,this.sortingDirection);
     }
   }
+                /*----------------------------------------------------- */
 
   @tracked specificSearch = {
-    name:"", year:"", genre:"", format:"", languages:"",
+    name:"",
+    year:"",
+    genre:"",
+    format:"",
+    languages:"",
   }
 
   @action updateSpecificSearch(column,event){
     this.specificSearch = {...this.specificSearch,[column]:event.target.value.toLowerCase()};
-  }
-
-  @action toggleDropdown() {
-    this.isShowDropDown = !this.isShowDropDown;
-  }
-
-  @action toggleColumn(colName) {
-    let column = this.columnsOptions.find((column) => column.name === colName);
-    column.visible = !column.visible;
-    this.columnsOptions = [...this.columnsOptions];
-  }
-
-  get isVisible() {
-    return this.columnsOptions.reduce((accumulator, column) => {
-      accumulator[column.name] = column.visible;
-      return accumulator;
-    }, {});
-  }
-
-  @action hideDropDown() {
-    this.isShowDropDown = false;
   }
 
   @action infoMessageShow() {
@@ -122,8 +172,10 @@ export default class MovieListComponent extends Component {
     this.searchMovie = event.target.value.toLowerCase();
   }
 
-  get filteredMovieList() {   
 
+                       /*--------- All filtering conditions ----------*/
+                       
+  get filteredMovieList() {   
     let filtered = this.moviesList;
 
     if (this.searchMovie) {
@@ -152,21 +204,23 @@ export default class MovieListComponent extends Component {
       filtered = filtered.slice().sort((a,b) => {
         let A = a[this.sortingBy];
         let B = b[this.sortingBy]; 
-        console.log(A,B);
+        /*console.log(A,B);*/ 
         if(typeof A === "number" && typeof B === "number"){
           return this.sortingDirection === "ascending" ? A - B : B - A;
         }
 
         A = String(a[this.sortingBy]).toLowerCase();
         B = String(b[this.sortingBy]).toLowerCase();
-        console.log(A,B);
-        if(A < B) return this.sortingDirection === "ascending"? -1 : 1
+        /*console.log(A,B); */ 
+       if(A < B) return this.sortingDirection === "ascending"? -1 : 1
         if(A > B) return this.sortingDirection === "ascending"? 1 : -1
         return 0;
       })
     }
     return filtered;
   }
+                   /*-------------------------------------------------------*/
+
 
   @task *deleteMovieTask(movie) {
     try {
@@ -180,6 +234,8 @@ export default class MovieListComponent extends Component {
       this.flashMessages.danger('Deletion Incomplete');
     }
   }
+
+                        /*------------------------------------------- */
 
   @action selectMovie(movie) {
     this.args.movies.moviesList = this.args.movies.moviesList.map((m) =>
@@ -209,6 +265,8 @@ export default class MovieListComponent extends Component {
       this.flashMessages.danger('Bulk Deletion Incomplete');
     }
   }
+
+                          /*-------------------------------------------*/
 
   @action openDemoPage(event) {
     event.preventDefault();

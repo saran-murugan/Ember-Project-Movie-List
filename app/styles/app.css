@@ -173,10 +173,10 @@ button:hover {
   box-shadow: 5px 5px 10px rgb(0, 0, 0, 0.3);
   margin-top: 30px;
   height: auto;
-  width: 100%;
-  overflow-x: auto;
+  overflow-x:visible;
   overflow-y: hidden;
 }
+
 table {
   width: 100%;
   border-collapse: collapse;
@@ -184,6 +184,7 @@ table {
   border-radius: 10px;
   margin: 0 auto;
   border: 2px solid #ccc;
+  border: none;
 }
 
 .scrollable-head tr {
@@ -191,6 +192,7 @@ table {
   table-layout: fixed;
   width: 100%;
 }
+
 .scrollable-head .headers th:not(.no-sort){
   text-align: center;
   cursor: pointer;
@@ -203,6 +205,12 @@ table {
 .scrollable-head .specific-search-tr th{
   background-color: whitesmoke;
   padding:8px 8px 0px 8px;
+  overflow-x: scroll;
+  scrollbar-width: none;
+}
+.scrollable-head .specific-search-tr th input{
+  width: 85%;
+  max-width: 200px;
 }
 .scrollable-body {
   height: 300px;
@@ -224,15 +232,12 @@ table {
 .scrollable-body:hover::-webkit-scrollbar-thumb {
   background-color: rgba(0, 0, 0, 0.5);
 }
-
 .scrollable-body tr {
   display: table;
   table-layout: fixed;
   width: 100%;
 }
-th,
-td {
-  /*   min-width:100px; */
+th,td {
   padding: 8px 20px;
   border: 1px solid hsl(0deg 0% 87%);
   text-align: center;
@@ -243,7 +248,24 @@ th {
   font-size: 18px;
 }
 
-th:nth-of-type(1) {
+th.resizable{
+  position: relative;
+}
+.resize-marker{
+  position: absolute;
+  top: 0;
+  right: 0;
+  background-image: repeating-linear-gradient(to right, #ccc,#ccc 2px, transparent 2px, transparent 4px);
+  width: 10px;
+  height: 100%;
+  z-index: 10;
+} 
+
+.options-resize{
+  left: 0;
+}
+
+/* th:nth-of-type(1) {
   width: 210px;
 }
 th:nth-of-type(2) {
@@ -260,37 +282,30 @@ th:nth-of-type(5) {
 }
 th:nth-of-type(6) {
   width: 208px;
+} */
+
+ td:nth-of-type(1) {
+  text-align: left;
+  overflow-x: scroll;
+  text-wrap: nowrap;
+  scrollbar-width: none;
 }
 
-td:nth-of-type(1) {
-  width: 210px;
-  text-align: left;
-  overflow-x: scroll;
-  text-wrap: nowrap;
-  scrollbar-width: none;
-}
-td:nth-of-type(2) {
-  width: 210px;
-}
 td:nth-of-type(3) {
-  width: 210px;
   overflow-x: scroll;
   text-wrap: nowrap;
   scrollbar-width: none;
   text-align: left;
 }
-td:nth-of-type(4) {
-  width: 210px;
-}
+
 td:nth-of-type(5) {
-  width: 210px;
   overflow-x: scroll;
   text-wrap: nowrap;
   scrollbar-width: none;
   text-align: left;
 }
 td:nth-of-type(6) {
-  width: 200px;
+  min-width: 200px;
   overflow-x: scroll;
   text-wrap: nowrap;
   scrollbar-width: none;
@@ -298,7 +313,130 @@ td:nth-of-type(6) {
 
 tr:hover {
   background-color: #ddd;
+} 
+
+/* //////////////////////////////////////////////////////////////// */
+
+/* .movie-list-container {
+  box-shadow: 5px 5px 10px rgb(0 0 0 / 0.3);
+  margin-top: 30px;
+  width: 100%;
+  overflow: hidden;
 }
+
+table {
+  max-width: 100%;
+  width: auto;
+  border-collapse: collapse;
+  background: white;
+  border-radius: 10px;
+  margin: 0 auto;
+  border: 2px solid #ccc;
+}
+
+.scrollable-head, .scrollable-body {
+  overflow-x: hidden;
+}
+
+.scrollable-head tr,
+.scrollable-body tr {
+  display: table;
+  width: 100%;
+}
+
+.scrollable-head .headers th:not(.no-sort) {
+  text-align: center;
+  cursor: pointer;
+}
+
+.scrollable-head tr th span {
+  font-size: 20px;
+  font-weight: 900;
+}
+
+.scrollable-head .specific-search-tr th {
+  background-color: whitesmoke;
+  padding: 8px 8px 0 8px;
+}
+
+.scrollable-head .specific-search-tr th input {
+  width: 85%;
+  max-width: 200px;
+  min-width: 60px;
+}
+
+.scrollable-body {
+  height: 300px;
+  overflow-y: auto;
+  font-size: 20px;
+  color: slategrey;
+  font-weight: 600;
+}
+
+.scrollable-body::-webkit-scrollbar {
+  width: 10px;
+  background-color: transparent;
+}
+
+.scrollable-body::-webkit-scrollbar-thumb {
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
+.scrollable-body:hover::-webkit-scrollbar-thumb {
+  background-color: rgba(0, 0, 0, 0.5);
+}
+
+th, td {
+  padding: 8px 20px;
+  border: 1px solid hsl(0 0% 87%);
+  text-align: center;
+  white-space: nowrap;
+}
+
+th {
+  background-color: rgb(56, 133, 201);
+  color: #fff;
+  font-size: 18px;
+}
+
+th.resizable {
+  position: relative;
+}
+
+.resize-marker {
+  position: absolute;
+  top: 0;
+  right: 0;
+  cursor: col-resize;
+  width: 10px;
+  height: 100%;
+  z-index: 10;
+}
+
+ Remove horizontal scrolling per cell 
+td:nth-of-type(1),
+td:nth-of-type(3),
+td:nth-of-type(5),
+td:nth-of-type(6) {
+  text-align: left;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+ Ensure Options column stays in view 
+td:nth-of-type(6) {
+  min-width: 180px;
+  max-width: 200px;
+}
+
+ Row hover 
+tr:hover {
+  background-color: #ddd;
+} */
+
+/* //////////////////////////////////////////////////////////////// */
 
 .delete-btn,
 #bulk-delete-btn,
@@ -339,6 +477,7 @@ tr:hover {
   padding: 10px;
   border: 2px solid #ccc;
   border-radius: 8px;
+  z-index: 11;
 }
 .col-dropdown div {
   display: flex;

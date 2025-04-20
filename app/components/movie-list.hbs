@@ -55,9 +55,9 @@
     </div>
     </LiquidIf>
 
-    <button class="col-dropdown-btn" type="button" {{on "click" this.toggleDropdown}} >Columns show/hide</button>
-    {{#if this.isShowDropDown}}
-    <div class="col-dropdown" {{on-click-outside this.hideDropDown}}>
+    <button class="col-dropdown-btn" type="button" {{on "click" this.toggleColumnDropdown}} >Columns show/hide</button>
+    {{#if this.isShowColumnDropdown}}
+    <div class="col-dropdown" {{on-click-outside this.hideColumnDropDown}}>
         {{#each this.columnsOptions as |column|}}
         <div> 
             <label><input type="checkbox" checked={{column.visible}} {{on "change" (fn this.toggleColumn column.name)}}>{{column.labelName}}</label>
@@ -66,55 +66,86 @@
     </div>
     {{/if}}
 
-    <div class="movie-list-container">
+     <div class="movie-list-container">
         {{#if (atleast-one-column-present this.isVisible)}}
         <div class="scrollable-head">
         <table class="movie-table">
             <thead>
                 <tr class="headers">
-                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "name")}}>
+                    {{#if this.isVisible.name}}
+                    <th style="width:{{this.columnWidths.name}}px;" class="resizable">
+                        <div {{on "click" (fn this.sortColumn "name")}}>
                         Name
                         {{#if (eq this.sortingBy "name")}}
                         {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
                         {{/if}}
-                        </th>
+                        </div>
+                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "name")}}></div>
+                    </th>
                     {{/if}}
-                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "year")}}>
+                    {{#if this.isVisible.year}}
+                    <th style="width:{{this.columnWidths.year}}px;" class="resizable">
+                        <div {{on "click" (fn this.sortColumn "year")}}>
                         Year
                         {{#if (eq this.sortingBy "year")}}
                         {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
                         {{/if}}
-                        </th>
+                        </div>
+                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "year")}}></div>
+                    </th>
                     {{/if}}
-                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "genre")}}>
+                    {{#if this.isVisible.genre}}
+                    <th style="width:{{this.columnWidths.genre}}px;" class="resizable">
+                        <div {{on "click" (fn this.sortColumn "genre")}} >
                         Genre
                         {{#if (eq this.sortingBy "genre")}}
                         {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
                         {{/if}}
-                        </th>
+                        </div>
+                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "genre")}}></div>
+                    </th>
                     {{/if}}
-                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "format")}}>
+                    {{#if this.isVisible.format}}
+                    <th style="width:{{this.columnWidths.format}}px;" class="resizable">
+                        <div {{on "click" (fn this.sortColumn "format")}} >
                         Format
                         {{#if (eq this.sortingBy "format")}}
                         {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
                         {{/if}}
+                        </div>
+                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "format")}}></div>
                         </th>
                     {{/if}}
-                    {{#if this.isVisible.name}}<th {{on "click" (fn this.sortColumn "languages")}}>
+                    {{#if this.isVisible.languages}}
+                    <th style="width:{{this.columnWidths.languages}}px;" class="resizable">
+                        <div {{on "click" (fn this.sortColumn "languages")}} >
                         Languages
                         {{#if (eq this.sortingBy "languages")}}
                         {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
                         {{/if}}
+                        </div>
+                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "languages")}}></div>
                         </th>
                     {{/if}}
-                    {{#if this.isVisible.options}}<th class="no-sort">Options</th>{{/if}}
+                    {{#if this.isVisible.options}}
+                    <th class="resizable">
+                        <div {{on "click" (fn this.sortColumn "options")}} >
+                        <div class="resize-marker options-resize" {{on "mousedown" (fn this.resizeColumn "options")}}></div>
+                        Options
+                        {{#if (eq this.sortingBy "options")}}
+                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
+                        {{/if}}
+                        </div>
+                        </th>
+                    {{/if}}
                 </tr>
+
                 <tr class="specific-search-tr">
-                    {{#if this.isVisible.name}}<th><input type="text" value={{this.specificSearch.name}} {{on "input" (fn this.updateSpecificSearch "name")}} placeholder="search by name" /></th>{{/if}}
-                    {{#if this.isVisible.year}}<th><input type="text" value={{this.specificSearch.year}} {{on "input"  (fn this.updateSpecificSearch "year")}} placeholder="search by year" /></th>{{/if}}
-                    {{#if this.isVisible.genre}}<th><input type="text" value={{this.specificSearch.genre}} {{on "input"  (fn this.updateSpecificSearch "genre")}} placeholder="search by genre" /></th>{{/if}}
-                    {{#if this.isVisible.format}}<th><input type="text" value={{this.specificSearch.format}} {{on "input"  (fn this.updateSpecificSearch "format")}} placeholder="search by format" /></th>{{/if}}
-                    {{#if this.isVisible.languages}}<th><input type="text" value={{this.specificSearch.languages}} {{on "input"  (fn this.updateSpecificSearch "languages")}} placeholder="search by languages" /></th>{{/if}}
+                    {{#if this.isVisible.name}}<th style="width:{{this.columnWidths.name}}px;"><input type="text" value={{this.specificSearch.name}} {{on "input" (fn this.updateSpecificSearch "name")}} placeholder="search by name" /></th>{{/if}}
+                    {{#if this.isVisible.year}}<th style="width:{{this.columnWidths.year}}px;"><input type="text" value={{this.specificSearch.year}} {{on "input"  (fn this.updateSpecificSearch "year")}} placeholder="search by year" /></th>{{/if}}
+                    {{#if this.isVisible.genre}}<th style="width:{{this.columnWidths.genre}}px;"><input type="text" value={{this.specificSearch.genre}} {{on "input"  (fn this.updateSpecificSearch "genre")}} placeholder="search by genre" /></th>{{/if}}
+                    {{#if this.isVisible.format}}<th style="width:{{this.columnWidths.format}}px;"><input type="text" value={{this.specificSearch.format}} {{on "input"  (fn this.updateSpecificSearch "format")}} placeholder="search by format" /></th>{{/if}}
+                    {{#if this.isVisible.languages}}<th style="width:{{this.columnWidths.languages}}px;"><input type="text" value={{this.specificSearch.languages}} {{on "input"  (fn this.updateSpecificSearch "languages")}} placeholder="search by languages" /></th>{{/if}}
                     {{#if this.isVisible.options}}<th></th>{{/if}}
                 </tr>
             </thead>
@@ -125,7 +156,7 @@
                 {{#if (is-empty this.filteredMovieList)}}
                 <td id="fall-p" colspan="6">No Movies Found,try different filter or search query</td>
                 {{else}}
-                {{log this.filteredMovieList}}
+                 {{log this.filteredMovieList}} 
                 <VerticalCollection
                 @items={{this.filteredMovieList}}
                 @bufferSize={{5}}
@@ -134,11 +165,11 @@
                 @containerSelector="#movie-list"
                 as |movie| >
                     <tr class={{if movie.isSelected "selected"}} {{on "dblclick" (fn this.selectMovie movie)}}>
-                        {{#if this.isVisible.name}}<td>{{movie.name}}</td>{{/if}}
-                        {{#if this.isVisible.year}}<td>{{movie.year}}</td>{{/if}}
-                        {{#if this.isVisible.genre}}<td>{{movie.genre}}</td>{{/if}}
-                        {{#if this.isVisible.format}}<td>{{movie.format}}</td>{{/if}}
-                        {{#if this.isVisible.languages}}<td>{{join ", " movie.languages}}</td>{{/if}}
+                        {{#if this.isVisible.name}}<td style="width:{{this.columnWidths.name}}px;">{{movie.name}}</td>{{/if}}
+                        {{#if this.isVisible.year}}<td style="width:{{this.columnWidths.year}}px;">{{movie.year}}</td>{{/if}}
+                        {{#if this.isVisible.genre}}<td style="width:{{this.columnWidths.genre}}px;">{{movie.genre}}</td>{{/if}}
+                        {{#if this.isVisible.format}}<td style="width:{{this.columnWidths.format}}px;">{{movie.format}}</td>{{/if}}
+                        {{#if this.isVisible.languages}}<td style="width:{{this.columnWidths.languages}}px;">{{join ", " movie.languages}}</td>{{/if}}
                         {{#if this.isVisible.options}}
                         <td>
                             <LinkTo @route="movies.edit" @model={{movie.id}}>
@@ -156,4 +187,8 @@
           <p class="fall-p">All columns are hidden. Use columns-dropdown to show some of them</p>
         {{/if}}
     </div>
+
+
+
+
 </div>
