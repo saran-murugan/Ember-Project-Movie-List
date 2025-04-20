@@ -5,17 +5,22 @@ import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
 
 export default class MovieListComponent extends Component {
-    /*---------------constructor-------------------  */
+  /*---------------constructor-------------------  */
   constructor() {
     super(...arguments);
     this.genres = this.getUniqueGenres();
 
-    const saveColumnWidthsFromLocalStorage = localStorage.getItem('columnWidthsSaved');
-    if(saveColumnWidthsFromLocalStorage){
-      this.columnWidths = JSON.parse(saveColumnWidthsFromLocalStorage);
+    const savedColumnWidthsFromLocalStorage =
+      localStorage.getItem('columnWidthsSaved');
+    if (savedColumnWidthsFromLocalStorage) {
+      try {
+        this.columnWidths = JSON.parse(savedColumnWidthsFromLocalStorage);
+      } catch (e) {
+        console.log(e, 'Could not fetch the column widths');
+      }
     }
   }
-   /* ---------------------------------- */
+  /* ---------------------------------- */
 
   @service router;
   @service flashMessages;
@@ -26,43 +31,68 @@ export default class MovieListComponent extends Component {
   @tracked genres = [];
   @tracked isInfo = false;
 
-  
-                              /* for column resizing functionality */
+  /* specific Search functionality */
+
+  @tracked specificSearch = {
+    name: '',
+    year: '',
+    genre: '',
+    format: '',
+    languages: '',
+  };
+
+  @action updateSpecificSearch(column, event) {
+    this.specificSearch = {
+      ...this.specificSearch,
+      [column]: event.target.value.toLowerCase(),
+    };
+  }
+  /*  -------------------------------------------------  */
+
+  /* for column resizing functionality */
   @tracked columnWidths = {
-    name:220,
-    year:150,
-    genre:250,
-    format:150,
-    languages:250,
- }
+    name: 220,
+    year: 150,
+    genre: 250,
+    format: 150,
+    languages: 250,
+  };
 
- saveColumnWidths(){
-  localStorage.setItem("columnWidthsSaved",JSON.stringify(this.columnWidths));
- }
-
-  @action resizeColumn(colName,event){
-    let startPosition = event.pageX;
-    let startingWidth = this.columnWidths[colName];
-    console.log("startX-dimension:",startPosition,"startingWidth:",startingWidth);
-
-    const mouseMove = (e)=>{
-      let newWidth = Math.max(100,startingWidth + (e.pageX - startPosition));
-      console.log("newWidth:",newWidth);
-      this.columnWidths = {...this.columnWidths,[colName]:newWidth};
-      console.log(this.columnWidths);
-    }
-    const onMouseUp = ()=>{
-        window.removeEventListener("mousemove",mouseMove);
-        window.removeEventListener("mouseup",onMouseUp)
-        this.saveColumnWidths();
-    }
-    window.addEventListener("mousemove",mouseMove)
-    window.addEventListener("mouseup",onMouseUp);
+  saveColumnWidths() {
+    localStorage.setItem(
+      'columnWidthsSaved',
+      JSON.stringify(this.columnWidths),
+    );
   }
 
-                    /*-------------------------------------------*/
+  @action resizeColumn(colName, event) {
+    let startPosition = event.pageX;
+    let startingWidth = this.columnWidths[colName];
+    console.log(
+      'startX-dimension:',
+      startPosition,
+      'startingWidth:',
+      startingWidth,
+    );
 
-                             /* column show/hide functionality */
+    const mouseMove = (e) => {
+      let newWidth = Math.max(100, startingWidth + (e.pageX - startPosition));
+      console.log('newWidth:', newWidth);
+      this.columnWidths = { ...this.columnWidths, [colName]: newWidth };
+      console.log(this.columnWidths);
+    };
+    const onMouseUp = () => {
+      window.removeEventListener('mousemove', mouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+      this.saveColumnWidths();
+    };
+    window.addEventListener('mousemove', mouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+  }
+
+  /*-------------------------------------------*/
+
+  /* column show/hide functionality */
 
   @tracked isShowColumnDropdown = false;
 
@@ -92,43 +122,39 @@ export default class MovieListComponent extends Component {
     }, {});
   }
 
-                /*---------------------------------------------------*/
+  /*---------------------------------------------------*/
 
-                      /* Column data sorting functionality */
+  /* Column data sorting functionality */
 
-  @tracked sortingBy = "";
-  @tracked sortingDirection = "ascending";
+  @tracked sortingBy = '';
+  @tracked sortingDirection = 'ascending';
 
-  @action sortColumn(colToSort){
-    if(this.sortingBy === colToSort){
-      if(this.sortingDirection === "ascending"){
-        this.sortingDirection = "descending";
+  @action sortColumn(colToSort) {
+    if (this.sortingBy === colToSort) {
+      if (this.sortingDirection === 'ascending') {
+        this.sortingDirection = 'descending';
+      } else if (this.sortingDirection === 'descending') {
+        this.sortingBy = '';
+        this.sortingDirection = '';
       }
-      else if(this.sortingDirection === "descending"){
-        this.sortingBy = "";
-        this.sortingDirection = "";
-      }
-      console.log("before",this.sortingBy,this.sortingDirection);
-    }
-    else {
+      console.log('before', this.sortingBy, this.sortingDirection);
+    } else {
       this.sortingBy = colToSort;
-      this.sortingDirection = "ascending";
-      console.log("after",this.sortingBy,this.sortingDirection);
+      this.sortingDirection = 'ascending';
+      console.log('after', this.sortingBy, this.sortingDirection);
     }
   }
-                /*----------------------------------------------------- */
+  /*----------------------------------------------------- */
 
-  @tracked specificSearch = {
-    name:"",
-    year:"",
-    genre:"",
-    format:"",
-    languages:"",
+  /* Expand Nested table details functionality */
+
+  @tracked NestedMovieId = null;
+
+  @action showNestedDetails(movieId) {
+    this.NestedMovieId = this.NestedMovieId === movieId ? null : movieId;
   }
 
-  @action updateSpecificSearch(column,event){
-    this.specificSearch = {...this.specificSearch,[column]:event.target.value.toLowerCase()};
-  }
+  /* ----------------------------------------- */
 
   @action infoMessageShow() {
     this.isInfo = !this.isInfo;
@@ -172,55 +198,57 @@ export default class MovieListComponent extends Component {
     this.searchMovie = event.target.value.toLowerCase();
   }
 
+  /*--------- All filtering conditions ----------*/
 
-                       /*--------- All filtering conditions ----------*/
-                       
-  get filteredMovieList() {   
+  get filteredMovieList() {
     let filtered = this.moviesList;
 
     if (this.searchMovie) {
-      filtered = filtered.filter((movie) =>
-        movie.name.toLowerCase().includes(this.searchMovie.toLowerCase()) ||
-        String(movie.year).includes(this.searchMovie) ||
-        movie.format.toLowerCase().includes(this.searchMovie) ||
-        movie.languages.join(", ").toLowerCase().includes(this.searchMovie.toLowerCase()) ||
-        movie.genre.toLowerCase().includes(this.searchMovie.toLowerCase())
+      filtered = filtered.filter(
+        (movie) =>
+          movie.name.toLowerCase().includes(this.searchMovie.toLowerCase()) ||
+          String(movie.year).includes(this.searchMovie) ||
+          movie.format.toLowerCase().includes(this.searchMovie) ||
+          movie.languages
+            .join(', ')
+            .toLowerCase()
+            .includes(this.searchMovie.toLowerCase()) ||
+          movie.genre.toLowerCase().includes(this.searchMovie.toLowerCase()),
       );
     }
     if (this.selectedGenre) {
-        filtered = filtered.filter((movie) =>
-          movie.genre.toLowerCase().includes(this.selectedGenre.toLowerCase()),
-        );
-      }
-    if (this.specificSearch){
-      filtered = filtered.filter((movie)=>{
-        return Object.entries(this.specificSearch).every(([key,value]) =>{
+      filtered = filtered.filter((movie) =>
+        movie.genre.toLowerCase().includes(this.selectedGenre.toLowerCase()),
+      );
+    }
+    if (this.specificSearch) {
+      filtered = filtered.filter((movie) => {
+        return Object.entries(this.specificSearch).every(([key, value]) => {
           if (!value) return true;
-          return String(movie[key]).toLowerCase().includes(value); 
-          })
-        })
-      }
-    if(this.sortingBy){
-      filtered = filtered.slice().sort((a,b) => {
+          return String(movie[key]).toLowerCase().includes(value);
+        });
+      });
+    }
+    if (this.sortingBy) {
+      filtered = filtered.slice().sort((a, b) => {
         let A = a[this.sortingBy];
-        let B = b[this.sortingBy]; 
-        /*console.log(A,B);*/ 
-        if(typeof A === "number" && typeof B === "number"){
-          return this.sortingDirection === "ascending" ? A - B : B - A;
+        let B = b[this.sortingBy];
+        /*console.log(A,B);*/
+        if (typeof A === 'number' && typeof B === 'number') {
+          return this.sortingDirection === 'ascending' ? A - B : B - A;
         }
 
         A = String(a[this.sortingBy]).toLowerCase();
         B = String(b[this.sortingBy]).toLowerCase();
-        /*console.log(A,B); */ 
-       if(A < B) return this.sortingDirection === "ascending"? -1 : 1
-        if(A > B) return this.sortingDirection === "ascending"? 1 : -1
+        /*console.log(A,B); */
+        if (A < B) return this.sortingDirection === 'ascending' ? -1 : 1;
+        if (A > B) return this.sortingDirection === 'ascending' ? 1 : -1;
         return 0;
-      })
+      });
     }
     return filtered;
   }
-                   /*-------------------------------------------------------*/
-
+  /*-------------------------------------------------------*/
 
   @task *deleteMovieTask(movie) {
     try {
@@ -235,7 +263,7 @@ export default class MovieListComponent extends Component {
     }
   }
 
-                        /*------------------------------------------- */
+  /*------------------------------------------- */
 
   @action selectMovie(movie) {
     this.args.movies.moviesList = this.args.movies.moviesList.map((m) =>
@@ -266,7 +294,7 @@ export default class MovieListComponent extends Component {
     }
   }
 
-                          /*-------------------------------------------*/
+  /*-------------------------------------------*/
 
   @action openDemoPage(event) {
     event.preventDefault();
