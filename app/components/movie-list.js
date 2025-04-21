@@ -10,17 +10,17 @@ export default class MovieListComponent extends Component {
     super(...arguments);
     this.genres = this.getUniqueGenres();
 
-    const savedColumnWidthsFromLocalStorage =
-      localStorage.getItem('columnWidthsSaved');
+    const savedColumnWidthsFromLocalStorage = localStorage.getItem('columnWidthsSaved');
     if (savedColumnWidthsFromLocalStorage) {
-      try {
-        this.columnWidths = JSON.parse(savedColumnWidthsFromLocalStorage);
-      } catch (e) {
-        console.log(e, 'Could not fetch the column widths');
-      }
+      this.columnWidths = JSON.parse(savedColumnWidthsFromLocalStorage);
+    }
+
+    const savedColumnVisibilityFromLocalStorage = localStorage.getItem('columnVisibilitySaved');
+    if(savedColumnVisibilityFromLocalStorage){
+      this.columnsOptions = JSON.parse(savedColumnVisibilityFromLocalStorage);
     }
   }
-  /* ---------------------------------- */
+  /* ---------------------------------------------- */
 
   @service router;
   @service flashMessages;
@@ -31,7 +31,7 @@ export default class MovieListComponent extends Component {
   @tracked genres = [];
   @tracked isInfo = false;
 
-  /* specific Search functionality */
+                    /* specific Search functionality */
 
   @tracked specificSearch = {
     name: '',
@@ -42,10 +42,7 @@ export default class MovieListComponent extends Component {
   };
 
   @action updateSpecificSearch(column, event) {
-    this.specificSearch = {
-      ...this.specificSearch,
-      [column]: event.target.value.toLowerCase(),
-    };
+    this.specificSearch = {...this.specificSearch,[column]: event.target.value.toLowerCase()};
   }
   /*  -------------------------------------------------  */
 
@@ -59,27 +56,16 @@ export default class MovieListComponent extends Component {
   };
 
   saveColumnWidths() {
-    localStorage.setItem(
-      'columnWidthsSaved',
-      JSON.stringify(this.columnWidths),
-    );
+    localStorage.setItem( 'columnWidthsSaved', JSON.stringify(this.columnWidths));
   }
 
   @action resizeColumn(colName, event) {
     let startPosition = event.pageX;
     let startingWidth = this.columnWidths[colName];
-    console.log(
-      'startX-dimension:',
-      startPosition,
-      'startingWidth:',
-      startingWidth,
-    );
 
     const mouseMove = (e) => {
       let newWidth = Math.max(100, startingWidth + (e.pageX - startPosition));
-      console.log('newWidth:', newWidth);
       this.columnWidths = { ...this.columnWidths, [colName]: newWidth };
-      console.log(this.columnWidths);
     };
     const onMouseUp = () => {
       window.removeEventListener('mousemove', mouseMove);
@@ -95,7 +81,7 @@ export default class MovieListComponent extends Component {
   /* column show/hide functionality */
 
   @tracked isShowColumnDropdown = false;
-
+  
   @tracked columnsOptions = [
     { name: 'name', labelName: 'Name', visible: true },
     { name: 'year', labelName: 'Year', visible: true },
@@ -114,6 +100,7 @@ export default class MovieListComponent extends Component {
     let column = this.columnsOptions.find((column) => column.name === colName);
     column.visible = !column.visible;
     this.columnsOptions = [...this.columnsOptions];
+    localStorage.setItem( 'columnVisibilitySaved', JSON.stringify(this.columnsOptions));
   }
   get isVisible() {
     return this.columnsOptions.reduce((accumulator, column) => {
@@ -169,6 +156,13 @@ export default class MovieListComponent extends Component {
 
   get currentRoute() {
     return this.router.currentRouteName;
+  }
+
+  get columnName(){
+    return this.args.movies.columnName;
+  }
+  get optionsColumn(){
+    return this.args.movies.optionsColumn;
   }
 
   get moviesList() {

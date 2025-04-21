@@ -72,81 +72,33 @@
         <table class="movie-table">
             <thead>
                 <tr class="headers">
-                    {{#if this.isVisible.name}}
-                    <th style="{{get-column-widths this.columnWidths "name"}}" class="resizable">
-                        <div {{on "click" (fn this.sortColumn "name")}}>
-                        Name
-                        {{#if (eq this.sortingBy "name")}}
+                    {{#each @movies.columnName as |column|}}
+                    {{#if (get-visibility-value this.isVisible column.name)}}
+                    <th style="{{get-column-widths this.columnWidths column.name}}" class="resizable">
+                        <div {{on "click" (fn this.sortColumn column.name)}}>
+                       {{column.label}}
+                        {{#if (eq this.sortingBy column.name)}}
                         {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
                         {{/if}}
                         </div>
-                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "name")}}></div>
+                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn column.name)}}></div>
                     </th>
                     {{/if}}
-                    {{#if this.isVisible.year}}
-                    <th style="{{get-column-widths this.columnWidths "year"}}" class="resizable">
-                        <div {{on "click" (fn this.sortColumn "year")}}>
-                        Year
-                        {{#if (eq this.sortingBy "year")}}
-                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
-                        {{/if}}
-                        </div>
-                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "year")}}></div>
-                    </th>
-                    {{/if}}
-                    {{#if this.isVisible.genre}}
-                    <th style="{{get-column-widths this.columnWidths "genre"}}" class="resizable">
-                        <div {{on "click" (fn this.sortColumn "genre")}} >
-                        Genre
-                        {{#if (eq this.sortingBy "genre")}}
-                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
-                        {{/if}}
-                        </div>
-                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "genre")}}></div>
-                    </th>
-                    {{/if}}
-                    {{#if this.isVisible.format}}
-                    <th style="{{get-column-widths this.columnWidths "format"}}" class="resizable">
-                        <div {{on "click" (fn this.sortColumn "format")}} >
-                        Format
-                        {{#if (eq this.sortingBy "format")}}
-                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
-                        {{/if}}
-                        </div>
-                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "format")}}></div>
-                    </th>
-                    {{/if}}
-                    {{#if this.isVisible.languages}}
-                    <th style="{{get-column-widths this.columnWidths "languages"}}" class="resizable">
-                        <div {{on "click" (fn this.sortColumn "languages")}} >
-                        Languages
-                        {{#if (eq this.sortingBy "languages")}}
-                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
-                        {{/if}}
-                        </div>
-                        <div class="resize-marker" {{on "mousedown" (fn this.resizeColumn "languages")}}></div>
-                        </th>
-                    {{/if}}
-                    {{#if this.isVisible.options}}
+                    {{/each}}
+                    {{!-- {{log @movies.optionsColumn.name}} --}}
+                    {{#if (get-visibility-value this.isVisible this.optionsColumn.name)}}
                     <th class="resizable">
-                        <div {{on "click" (fn this.sortColumn "options")}} >
-                        <div class="resize-marker options-resize" {{on "mousedown" (fn this.resizeColumn "options")}}></div>
-                        Options
-                        {{#if (eq this.sortingBy "options")}}
-                        {{#if (eq this.sortingDirection "ascending")}}<span>&#8593;</span>{{else}}<span>&#8595;</span>{{/if}}
-                        {{/if}}
-                        </div>
-                        </th>
+                        <div class="resize-marker options-resize" {{on "mousedown" (fn this.resizeColumn this.optionsColumn.name)}}></div>
+                        {{this.optionsColumn.label}}
+                    </th>
                     {{/if}}
                 </tr>
 
                 <tr class="specific-search-tr">
-                    {{#if this.isVisible.name}}<th style="{{get-column-widths this.columnWidths "name"}}"><input type="text" value={{this.specificSearch.name}} {{on "input" (fn this.updateSpecificSearch "name")}} placeholder="search by name" /></th>{{/if}}
-                    {{#if this.isVisible.year}}<th style="{{get-column-widths this.columnWidths "year"}}"><input type="text" value={{this.specificSearch.year}} {{on "input"  (fn this.updateSpecificSearch "year")}} placeholder="search by year" /></th>{{/if}}
-                    {{#if this.isVisible.genre}}<th style="{{get-column-widths this.columnWidths "genre"}}"><input type="text" value={{this.specificSearch.genre}} {{on "input"  (fn this.updateSpecificSearch "genre")}} placeholder="search by genre" /></th>{{/if}}
-                    {{#if this.isVisible.format}}<th style="{{get-column-widths this.columnWidths "format"}}"><input type="text" value={{this.specificSearch.format}} {{on "input"  (fn this.updateSpecificSearch "format")}} placeholder="search by format" /></th>{{/if}}
-                    {{#if this.isVisible.languages}}<th style="{{get-column-widths this.columnWidths "languages"}}"><input type="text" value={{this.specificSearch.languages}} {{on "input"  (fn this.updateSpecificSearch "languages")}} placeholder="search by languages" /></th>{{/if}}
-                    {{#if this.isVisible.options}}<th></th>{{/if}}
+                    {{#each @movies.columnName as |column|}}
+                    {{#if (get-visibility-value this.isVisible column.name)}}<th style="{{get-column-widths this.columnWidths column.name}}"><input type="text" value={{get-specific-search-value this.specificSearch column.name}} {{on "input" (fn this.updateSpecificSearch column.name)}} placeholder="search by name" /></th>{{/if}}
+                    {{/each}}
+                    {{#if (get-visibility-value this.isVisible this.optionsColumn.name)}}<th></th>{{/if}}
                 </tr>
             </thead>
         </table>
@@ -156,7 +108,6 @@
                 {{#if (is-empty this.filteredMovieList)}}
                 <td id="fall-p" colspan="6">No Movies Found,try different filter or search query</td>
                 {{else}}
-                 {{log this.filteredMovieList}} 
                 <VerticalCollection
                 @items={{this.filteredMovieList}}
                 @bufferSize={{5}}
@@ -165,12 +116,12 @@
                 @containerSelector="#movie-list"
                 as |movie| >
                     <tr class={{if movie.isSelected "selected"}} {{on "dblclick" (fn this.selectMovie movie)}} {{on "click" (fn this.showNestedDetails movie.id)}}>
-                        {{#if this.isVisible.name}}<td style="{{get-column-widths this.columnWidths "name"}}">{{movie.name}}</td>{{/if}}
-                        {{#if this.isVisible.year}}<td style="{{get-column-widths this.columnWidths "year"}}">{{movie.year}}</td>{{/if}}
-                        {{#if this.isVisible.genre}}<td style="{{get-column-widths this.columnWidths "genre"}}">{{movie.genre}}</td>{{/if}}
-                        {{#if this.isVisible.format}}<td style="{{get-column-widths this.columnWidths "format"}}">{{movie.format}}</td>{{/if}}
-                        {{#if this.isVisible.languages}}<td style="{{get-column-widths this.columnWidths "languages"}}">{{join ", " movie.languages}}</td>{{/if}}
-                        {{#if this.isVisible.options}}
+                        {{#if (get-visibility-value this.isVisible this.columnName.[0].name)}}<td style="{{get-column-widths this.columnWidths this.columnName.[0].name}}">{{movie.name}}</td>{{/if}}
+                        {{#if (get-visibility-value this.isVisible this.columnName.[1].name)}}<td style="{{get-column-widths this.columnWidths this.columnName.[1].name}}">{{movie.year}}</td>{{/if}}
+                        {{#if (get-visibility-value this.isVisible this.columnName.[2].name)}}<td style="{{get-column-widths this.columnWidths this.columnName.[2].name}}">{{movie.genre}}</td>{{/if}}
+                        {{#if (get-visibility-value this.isVisible this.columnName.[3].name)}}<td style="{{get-column-widths this.columnWidths this.columnName.[3].name}}">{{movie.format}}</td>{{/if}}
+                        {{#if (get-visibility-value this.isVisible this.columnName.[4].name)}}<td style="{{get-column-widths this.columnWidths this.columnName.[4].name}}">{{join ", " movie.languages}}</td>{{/if}}
+                        {{#if (get-visibility-value this.isVisible this.optionsColumn.name)}}
                         <td>
                             <LinkTo @route="movies.edit" @model={{movie.id}}>
 								<button class="edit-btn" type="button">Edit</button>
@@ -194,6 +145,18 @@
                                     <td class="nested-details" colspan="5">{{movie.cast}}</td>
                                     </tr>
                                 </tbody>
+                            <NestedMovieTable>
+                                <table>
+                                    <tbody>
+                                        <tr>
+                                        <td colspan="1">{{@movies.nestedColumns.[0].label}}</td>
+                                        <td class="nested-details" colspan="5">{{movie.description}}</td>
+                                        </tr>
+                                        <tr>
+                                        <td colspan="1">{{@movies.nestedColumns.[1].label}}</td>
+                                        <td class="nested-details" colspan="5">{{movie.cast}}</td>
+                                        </tr>
+                                    </tbody>
                                 </table>
                             </NestedMovieTable>
                         </td>
@@ -207,8 +170,4 @@
           <p class="fall-p">All columns are hidden. Use columns-dropdown to show some of them</p>
         {{/if}}
     </div>
-
-
-
-
 </div>
