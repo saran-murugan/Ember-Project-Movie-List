@@ -133,30 +133,18 @@
                     {{#if (eq this.NestedMovieId movie.id)}}
                     <tr class="nested-tr">
                         <td colspan="6">
-                             <NestedMovieTable>
-                                <table>
-                                <tbody>
-                                    <tr>
-                                    <td colspan="1">Description</td>
-                                    <td class="nested-details"  colspan="5">{{movie.description}}</td>
-                                    </tr>
-                                    <tr>
-                                    <td colspan="1">Cast</td>
-                                    <td class="nested-details" colspan="5">{{movie.cast}}</td>
-                                    </tr>
-                                </tbody>
                             <NestedMovieTable>
                                 <table>
                                     <tbody>
-                                        <tr>
-                                        <td colspan="1">{{@movies.nestedColumns.[0].label}}</td>
-                                        <td class="nested-details" colspan="5">{{movie.description}}</td>
-                                        </tr>
-                                        <tr>
-                                        <td colspan="1">{{@movies.nestedColumns.[1].label}}</td>
-                                        <td class="nested-details" colspan="5">{{movie.cast}}</td>
-                                        </tr>
-                                    </tbody>
+                                    <tr>
+                                    <td colspan="1">{{@movies.nestedColumns.[0].label}}</td>
+                                    <td class="nested-details" colspan="5">{{movie.description}}</td>
+                                    </tr>
+                                    <tr>
+                                    <td colspan="1">{{@movies.nestedColumns.[1].label}}</td>
+                                    <td class="nested-details" colspan="5">{{movie.cast}}</td>
+                                    </tr>
+                                </tbody>
                                 </table>
                             </NestedMovieTable>
                         </td>

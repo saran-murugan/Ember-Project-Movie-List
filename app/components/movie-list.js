@@ -44,6 +44,7 @@ export default class MovieListComponent extends Component {
   @action updateSpecificSearch(column, event) {
     this.specificSearch = {...this.specificSearch,[column]: event.target.value.toLowerCase()};
   }
+  
   /*  -------------------------------------------------  */
 
   /* for column resizing functionality */
