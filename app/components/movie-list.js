@@ -5,6 +5,10 @@ import { inject as service } from '@ember/service';
 import { task } from 'ember-concurrency';
 
 export default class MovieListComponent extends Component {
+
+  @service router;
+  @service flashMessages;
+
   /*---------------constructor-------------------  */
   constructor() {
     super(...arguments);
@@ -14,24 +18,43 @@ export default class MovieListComponent extends Component {
     if (savedColumnWidthsFromLocalStorage) {
       this.columnWidths = JSON.parse(savedColumnWidthsFromLocalStorage);
     }
-
     const savedColumnVisibilityFromLocalStorage = localStorage.getItem('columnVisibilitySaved');
     if(savedColumnVisibilityFromLocalStorage){
       this.columnsOptions = JSON.parse(savedColumnVisibilityFromLocalStorage);
     }
+    const savedColumnOrderFromLocalStorage = localStorage.getItem('savedColumnOrder');
+    if(savedColumnOrderFromLocalStorage){
+      this.columnNames = JSON.parse(savedColumnOrderFromLocalStorage);
+    }
   }
   /* ---------------------------------------------- */
 
-  @service router;
-  @service flashMessages;
+  get optionsColumn(){
+    return this.args.movies.optionsColumn;
+  }
+  get moviesList() {
+    return this.args.movies.moviesList;
+  }
+  /* ----------------------------------------------- */
 
   @tracked searchMovie = '';
   @tracked isMessage = false;
-  @tracked selectedGenre = null;
-  @tracked genres = [];
   @tracked isInfo = false;
 
-                    /* specific Search functionality */
+  @action infoMessageShow() {
+    this.isInfo = !this.isInfo;
+  }
+  @action hideInfo() {
+    this.isInfo = false;
+  }
+  @action messageHidden() {
+    this.isMessage = false;
+  }
+  @action updateSearchMovie(event) {
+    this.searchMovie = event.target.value.toLowerCase();
+  }
+
+  /* specific Search functionality */
 
   @tracked specificSearch = {
     name: '',
@@ -44,8 +67,9 @@ export default class MovieListComponent extends Component {
   @action updateSpecificSearch(column, event) {
     this.specificSearch = {...this.specificSearch,[column]: event.target.value.toLowerCase()};
   }
-  
+
   /*  -------------------------------------------------  */
+
 
   /* for column resizing functionality */
   @tracked columnWidths = {
@@ -78,6 +102,7 @@ export default class MovieListComponent extends Component {
   }
 
   /*-------------------------------------------*/
+
 
   /* column show/hide functionality */
 
@@ -112,7 +137,8 @@ export default class MovieListComponent extends Component {
 
   /*---------------------------------------------------*/
 
-  /* Column data sorting functionality */
+
+    /* Column data sorting functionality */
 
   @tracked sortingBy = '';
   @tracked sortingDirection = 'ascending';
@@ -134,6 +160,7 @@ export default class MovieListComponent extends Component {
   }
   /*----------------------------------------------------- */
 
+
   /* Expand Nested table details functionality */
 
   @tracked NestedMovieId = null;
@@ -144,37 +171,45 @@ export default class MovieListComponent extends Component {
 
   /* ----------------------------------------- */
 
-  @action infoMessageShow() {
-    this.isInfo = !this.isInfo;
-  }
-  @action hideInfo() {
-    this.isInfo = false;
-  }
 
-  @action messageHidden() {
-    this.isMessage = false;
-  }
-
-  get currentRoute() {
-    return this.router.currentRouteName;
-  }
+    /*   Drag and Drop fucntionality   */
 
   get columnName(){
     return this.args.movies.columnName;
   }
-  get optionsColumn(){
-    return this.args.movies.optionsColumn;
+
+  @tracked columnNames = this.columnName;
+  @tracked startDragIndex = null;
+
+  @action handleDragStart(sourceIndex){
+    this.startDragIndex = sourceIndex;
+    console.log("startDragColumn is:",this.startDragIndex);
+    console.log(this.columnsOptions,this.columnName);
   }
 
-  get moviesList() {
-    return this.args.movies.moviesList;
+  @action handleOnDrag(dropTargetIndex){
+    if(this.startDragIndex === null || this.startDragIndex === dropTargetIndex) return;
+    /* console.log("ondrag:",dropTargetIndex); */
+    const updatedCopy = [...this.columnNames];
+    const [colToMove] = updatedCopy.splice(this.startDragIndex,1);
+    updatedCopy.splice(dropTargetIndex,0,colToMove);
+
+    this.columnNames = updatedCopy;
+    localStorage.setItem("savedColumnOrder",JSON.stringify(this.columnNames));
+    this.startDragIndex = dropTargetIndex;
   }
 
-  @action routeChange() {
-    if (this.currentRoute == 'movies.index') {
-      this.router.transitionTo('index');
-    }
+  @action onDrop(){
+    this.startDragIndex = null;
   }
+
+  /* -----------------------------------------------------  */
+
+
+        /* Genre filter power selection  */
+
+  @tracked selectedGenre = null;
+  @tracked genres = [];
 
   getUniqueGenres() {
     let allGenres = this.moviesList.flatMap((movie) => movie.genre.split(','));
@@ -188,10 +223,8 @@ export default class MovieListComponent extends Component {
   @action genreReset() {
     this.selectedGenre = null;
   }
+   /*  ----------------------------------------  */
 
-  @action updateSearchMovie(event) {
-    this.searchMovie = event.target.value.toLowerCase();
-  }
 
   /*--------- All filtering conditions ----------*/
 
@@ -199,15 +232,11 @@ export default class MovieListComponent extends Component {
     let filtered = this.moviesList;
 
     if (this.searchMovie) {
-      filtered = filtered.filter(
-        (movie) =>
+      filtered = filtered.filter((movie) =>
           movie.name.toLowerCase().includes(this.searchMovie.toLowerCase()) ||
           String(movie.year).includes(this.searchMovie) ||
           movie.format.toLowerCase().includes(this.searchMovie) ||
-          movie.languages
-            .join(', ')
-            .toLowerCase()
-            .includes(this.searchMovie.toLowerCase()) ||
+          movie.languages.join(', ').toLowerCase().includes(this.searchMovie.toLowerCase()) ||
           movie.genre.toLowerCase().includes(this.searchMovie.toLowerCase()),
       );
     }
@@ -300,4 +329,15 @@ export default class MovieListComponent extends Component {
     event.preventDefault();
     this.router.transitionTo('movies.create');
   }
+
+  get currentRoute() {
+    return this.router.currentRouteName;
+  }
+
+  @action routeChange() {
+    if (this.currentRoute == 'movies.index') {
+      this.router.transitionTo('index');
+    }
+  }
+
 }

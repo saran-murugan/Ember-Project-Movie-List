@@ -284,6 +284,9 @@ th.resizable {
 .options-resize {
   left: 0;
 }
+th[draggable="true"] {
+  cursor:move;
+}
 
 td:nth-of-type(1) {
   text-align: left;
